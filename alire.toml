@@ -1,0 +1,15 @@
+name = "ttrader"
+description = "Trader Terminal and Simulator"
+version = "0.1.0-dev"
+
+authors = ["Denis Gerina"]
+maintainers = ["Denis Gerina <ecarapa@yahoo.com>"]
+maintainers-logins = ["Malajac"]
+licenses = "MIT OR Apache-2.0 WITH LLVM-exception"
+website = ""
+tags = []
+
+executables = ["ttrader"]
+
+[[depends-on]]
+raylib = "^1.0.1"
