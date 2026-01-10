@@ -12,6 +12,7 @@ procedure Ttrader is
 
    Simulator_Bounds : constant RL.Rectangle := (x => 500.0, y => 100.0, width => 200.0, height => 300.0);
    Simulator_Active : Boolean := False;
+
 begin
    RL.InitWindow (width => 800, height => 600, title => "Trader Terminal & Simulator");
 
@@ -26,6 +27,23 @@ begin
          if GUI.GuiWindowBox (bounds => Terminal_Bounds, title => "Trader Terminal") /= 0 then
             Terminal_Active := False;
          end if;
+
+          -- Example: Draw a simple linear spline inside the terminal window
+          declare
+            type Vector2_Array is array (Positive range <>) of aliased RL.Vector2;
+            Points : Vector2_Array := (
+               1 => (x => Terminal_Bounds.x + 20.0, y => Terminal_Bounds.y + 50.0),
+               2 => (x => Terminal_Bounds.x + 100.0, y => Terminal_Bounds.y + 80.0),
+               3 => (x => Terminal_Bounds.x + 200.0, y => Terminal_Bounds.y + 60.0),
+               4 => (x => Terminal_Bounds.x + 300.0, y => Terminal_Bounds.y + 120.0)
+            );
+          begin
+            RL.DrawSplineLinear
+              (points     => Points(1)'Unchecked_Access,
+               pointCount => Points'Length,
+               thick      => 3.0,
+               color_p    => RL.GREEN);
+          end;
       end if;
 
       if Simulator_Active then
