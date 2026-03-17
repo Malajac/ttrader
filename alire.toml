@@ -13,3 +13,6 @@ executables = ["ttrader"]
 
 [[depends-on]]
 raylib = "^1.0.1"
+
+[[depends-on]]
+utilada = "^2.8.0"

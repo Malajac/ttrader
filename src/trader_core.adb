@@ -8,7 +8,7 @@ package body Trader_Core is
    package GUI renames Raylib.GUI;
 
    procedure Render_Trader is
-      Terminal_Bounds : constant RL.Rectangle :=
+      Terminal_Bounds : RL.Rectangle :=
         (x => 50.0, y => 100.0, width => 400.0, height => 300.0);
       Terminal_Active : Boolean := False;
 
@@ -18,10 +18,13 @@ package body Trader_Core is
       Simulator_Bounds : constant RL.Rectangle :=
         (x => 500.0, y => 100.0, width => 200.0, height => 300.0);
       Simulator_Active : Boolean := False;
+
+      Dragging       : Boolean := False;
+      Last_Mouse_Pos : RL.Vector2 := (0.0, 0.0);
    begin
       RL.InitWindow
         (width => 800, height => 600, title => "Trader Terminal & Simulator");
-
+      --  RL.SetTargetFPS (30);
       GUI.GuiSetStyle
         (control  => GUI.DEFAULT,
          property => GUI.BACKGROUND_COLOR,
@@ -38,6 +41,7 @@ package body Trader_Core is
                Content    : constant RL.Rectangle :=
                  (x => 0.0, y => 0.0, width => 400.0, height => 600.0);
                Scroll_Res : Interfaces.C.int;
+
             begin
                Scroll_Res :=
                  GUI.GuiScrollPanel
@@ -47,9 +51,49 @@ package body Trader_Core is
                     scroll  => Scroll'Access,
                     view    => View'Access);
 
+               -- Make the terminal window moveable with the mouse
+               if RL.IsMouseButtonDown (RL.MOUSE_BUTTON_LEFT) then
+                  declare
+                     Mouse_Pos : constant RL.Vector2 := RL.GetMousePosition;
+
+                  begin
+                     if Mouse_Pos.x >= Terminal_Bounds.x
+                       and
+                         Mouse_Pos.x
+                         <= Terminal_Bounds.x + Terminal_Bounds.width
+                       and Mouse_Pos.y >= Terminal_Bounds.y
+                       and
+                         Mouse_Pos.y
+                         <= Terminal_Bounds.y + 30.0 -- title bar height
+                     then
+                        -- Drag the window
+                        if not Dragging then
+                           Dragging := True;
+                           Last_Mouse_Pos := Mouse_Pos;
+                        end if;
+                     end if;
+
+                     if Dragging then
+                        declare
+                           Dx : constant C_float :=
+                             Mouse_Pos.x - Last_Mouse_Pos.x;
+                           Dy : constant C_float :=
+                             Mouse_Pos.y - Last_Mouse_Pos.y;
+                        begin
+                           Terminal_Bounds.x := Terminal_Bounds.x + Dx;
+                           Terminal_Bounds.y := Terminal_Bounds.y + Dy;
+                           Last_Mouse_Pos := Mouse_Pos;
+                        end;
+                     end if;
+                  end;
+               else
+                  Dragging := False;
+               end if;
+
                if GUI.GuiButton
                     (bounds =>
-                       (x      => Terminal_Bounds.x + Terminal_Bounds.width - 22.0,
+                       (x      =>
+                          Terminal_Bounds.x + Terminal_Bounds.width - 22.0,
                         y      => Terminal_Bounds.y + 2.0,
                         width  => 20.0,
                         height => 20.0),
